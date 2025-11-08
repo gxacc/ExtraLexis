@@ -33,8 +33,6 @@ local function selected_cut_value(combo)
 end
 
 local function editCuts(heist_type)
-    local edition = 'E'
-
     local cuts = {
         selected_cut_value(cut_player1),
         selected_cut_value(cut_player2),
@@ -43,13 +41,13 @@ local function editCuts(heist_type)
     }
 
     local base_values = {
-        CAYO      = { E = 1976686, L = 1975407 },
-        DOOMSDAY  = { E = 1965032, L = 1964472 },
-        DIAMOND   = { E = 1971321, L = 1969042 },
-        APARTMENT = { E = 1931801, L = 1931324 },
+        CAYO      = 1976686,
+        DOOMSDAY  = 1965032,
+        DIAMOND   = 1971321,
+        APARTMENT = 1931801,
     }
 
-    local base = base_values[heist_type] and base_values[heist_type][edition]
+    local base = base_values[heist_type]
     if not base then
         printF('Invalid heist type')
         return
@@ -61,6 +59,7 @@ local function editCuts(heist_type)
 
     printF(string.format('[%s] Cuts set successfully!', heist_type))
 end
+
 
 missionCutEditor:button('Modify Cuts'):event(0, function()
     util.create_thread(function(thread)
@@ -84,6 +83,7 @@ local instantFinishMenu = root:submenu('Instant Finish')
 local missionInstantSel = instantFinishMenu:combo_int('Select Mission', missionInstantOptions, 0)
 
 local function finish(heist_type)
+    -- This isn't working for some reason
     -- if not (script.is_running('fm_mission_controller') or script.is_running('fm_mission_controller_2020')) then
     --   printF('You are not in a mission!')
     -- return
@@ -91,7 +91,7 @@ local function finish(heist_type)
 
     if heist_type == 'APARTMENT' then
         local heist = account.stats('HEIST_MISSION_RCONT_ID_1').string
-        if heist == 'zCxFg29teE2ReKGnr0L4Bg' then
+        if heist == 'zCxFg29teE2ReKGnr0L4Bg' then                                 -- PacificJob
             script.locals("fm_mission_controller", 20391 + 1062).int32 = 5        -- 2
             script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80   -- 3
             script.locals("fm_mission_controller", 20391 + 2686).int32 = 10000000 -- 4
