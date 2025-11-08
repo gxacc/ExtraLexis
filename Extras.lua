@@ -3,7 +3,7 @@ local function printF(message)
     print(message)
 end
 
-local root = menu.root()
+local root = menu.player_root()
 
 -- Cut Editor start
 local missionCutOptions = {
@@ -77,6 +77,7 @@ local missionInstantOptions = {
     { 'DOOMSDAY',  2 },
     { 'CAYO',      3 },
     { 'AUTOSHOP',  4 },
+    { 'AGENCY',    5 },
 }
 
 local instantFinishMenu = root:submenu('Instant Finish')
@@ -130,6 +131,9 @@ local function finish(heist_type)
     elseif heist_type == 'AUTOSHOP' then
         script.locals("fm_mission_controller_2020", 54763 + 1).int32 = 51338977   -- 1
         script.locals("fm_mission_controller_2020", 54763 + 1776 + 1).int32 = 101 -- 2
+    elseif heist_type == 'AGENCY' then
+        script.locals("fm_mission_controller_2020", 54763 + 1).int32 = 51338752   -- 1
+        script.locals("fm_mission_controller_2020", 54763 + 1776 + 1).int32 = 50  -- 2
     end
 
     printF(string.format('[%s] Instant Finished!', heist_type))
