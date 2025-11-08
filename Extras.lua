@@ -41,10 +41,10 @@ local function editCuts(heist_type)
     }
 
     local base_values = {
-        CAYO      = 1976686,
-        DOOMSDAY  = 1965032,
-        DIAMOND   = 1971321,
-        APARTMENT = 1931801,
+        CAYO      = 1975799 + 831 + 56,
+        DOOMSDAY  = 1964170 + 812 + 50,
+        DIAMOND   = 1968996 + 1497 + 736 + 92,
+        APARTMENT = 1933768 + 3008,
     }
 
     local base = base_values[heist_type]
