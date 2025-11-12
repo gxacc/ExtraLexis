@@ -38,7 +38,7 @@ local success, error = pcall(function()
             log_notify('Invalid heist type')
             return
         elseif heist == 'APARTMENT' and not base then
-            base = 1933768 + 3008
+            base = 1931800 + 1
             for i, cut in ipairs(cuts) do
                 if i == 1 then
                     script.globals(base + i).int32 = 100 - (4 * cut)
@@ -47,10 +47,10 @@ local success, error = pcall(function()
                     script.globals(base + i).int32 = cut
                 end
             end
-        end
-
-        for i, cut in ipairs(cuts) do
-            script.globals(base + i).int32 = cut
+        else
+            for i, cut in ipairs(cuts) do
+                script.globals(base + i).int32 = cut
+            end
         end
     end
 
@@ -212,17 +212,17 @@ local success, error = pcall(function()
                 local heistType = _heistType(heistSelector.value)
                 local hlist = {'CAYO', 'AUTOSHOP', 'AGENCY'}
                 if hlist[heistType] then
-                    local script = "fm_mission_controller_2020"
-                    script.locals(script, Finish.New.Step1.vLocal).int32 = 5
-                    script.locals(script, Finish.New.Step2.vLocal).int32 = 999999
-                    script.locals(script, Finish.New.Step3.vLocal).int32 = SetBits(
-                        script.locals(script, Finish.New.Step3.vLocal).int32, {9, 16})
+                    local Script = "fm_mission_controller_2020"
+                    script.locals(Script, Finish.New.Step1.vLocal).int32 = 5
+                    script.locals(Script, Finish.New.Step2.vLocal).int32 = 999999
+                    script.locals(Script, Finish.New.Step3.vLocal).int32 = SetBits(
+                        script.locals(Script, Finish.New.Step3.vLocal).int32, {9, 16})
                 else
-                    local script = "fm_mission_controller"
-                    script.locals(script, Finish.Old.Step1.vLocal).int32 = 5
-                    script.locals(script, Finish.Old.Step2.vLocal).int32 = 999999
-                    local value = SetBits(script.locals(script, Finish.Old.Step3.vLocal).int32, {9, 16})
-                    script.locals(script, Finish.Old.Step3.vLocal).int32 = value
+                    local Script = "fm_mission_controller"
+                    script.locals(Script, Finish.Old.Step1.vLocal).int32 = 5
+                    script.locals(Script, Finish.Old.Step2.vLocal).int32 = 999999
+                    local value = SetBits(script.locals(Script, Finish.Old.Step3.vLocal).int32, {9, 16})
+                    script.locals(Script, Finish.Old.Step3.vLocal).int32 = value
                 end
             end)
             if not success then
@@ -256,6 +256,42 @@ local success, error = pcall(function()
                 return
             end
             log_notify('Reloaded planning table for ' .. heist .. '...')
+        end)
+
+    Menu:button('Solo Launch'):tooltip('Heists will be made launchable with less than min ammount of players required')
+        :event(0, function()
+            local Launch = {
+                locals = {
+                    Step1 = {
+                        vLocal = 19992 + 15
+                    },
+                    Step2 = {
+                        vLocal = 19992 + 34
+                    }
+                },
+                globals = {
+                    Step1 = {
+                        global = 4718592 + 3539
+                    },
+                    Step2 = {
+                        global = 4718592 + 3540
+                    },
+                    Step3 = {
+                        global = 4718592 + 3542 + 1
+                    },
+                    Step4 = {
+                        global = 4718592 + 190507 + 1
+                    }
+                }
+            }
+
+            script.locals("fmmc_launcher", Launch.locals.Step1.vLocal).int32 = 1
+            script.globals(794954 + 4 + 1 + (script.locals("fmmc_launcher", Launch.locals.Step2.vLocal).int32 * 95) + 75)
+                .int32 = 1
+            script.globals(Launch.globals.Step1.global).int32 = 1
+            script.globals(Launch.globals.Step2.global).int32 = 1
+            script.globals(Launch.globals.Step3.global).int32 = 1
+            script.globals(Launch.globals.Step4.global).int32 = 0
         end)
 
     local extraMenu = Menu:submenu('Other Options')
@@ -390,4 +426,3 @@ if not success then
     print('Error initializing Heist Utils: ' .. tostring(error))
     return
 end
-
