@@ -1,7 +1,7 @@
 -- Silent Night Heists Manager Lexis Port [SKID] { Credits: https://github.com/SilentSalo/SilentNight | https://github.com/xnightli06x/Silent-Night }
 -- Ported by @lrxxh & @piuro with the help of: Derkek, melonarmy122
 -- Testers: Derkek, 223, camera, Plex, Nexus
--- TODO: Doomsday, Cayo, Casino EXTRA options, Solo Launch [Apartment is done? - Need to copy over], whatever else is missing.
+-- TODO: Complete Preps for Diamond, cut presets, 12 mil payout
 -- HAVE FUN
 local success, error = pcall(function()
 
