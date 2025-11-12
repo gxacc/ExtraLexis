@@ -303,7 +303,7 @@ local success, error = pcall(function()
         log_notify("Cayo Perico Fingerprint hack bypassed.")
     end)
 
-    local cayoBagSize = cayoMenu:combo_int('Set Bag Size', {{'1x', 1}, {'2x', 2}, {'3x', 3}, {'4x', 4}}, 0)
+    local cayoBagSize = cayoMenu:combo_int('Set Bag Size', {{'1x', 1}, {'2x', 2}, {'3x', 3}, {'4x', 4}, {'5x', 5}}, 1)
 
     cayoMenu:button("Apply Bag Size"):event(0, function()
         local size = 1800 * cayoBagSize.value
