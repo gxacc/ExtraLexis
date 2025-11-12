@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
     "runtime.version": "Lua 5.3",
     "workspace.library": [
-        "c:\\Users\\nodyt\\.vscode\\extensions\\lexis.lexis-lua-api-vscode-1.0.0\\out\\emmylua\\lexis"
+        "c:\\Users\\Peter\\.vscode\\extensions\\lexis.lexis-lua-api-vscode-1.0.0\\out\\emmylua\\lexis"
     ],
     "diagnostics.disable": [
         "undefined-field",
