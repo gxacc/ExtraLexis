@@ -2,7 +2,7 @@
 -- Ported by @lrxxh & @piuro with the help of: Derkek, melonarmy122
 -- Testers: Derkek, 223, camera, Plex, Nexus
 -- TODO: Doomsday, Cayo, Casino EXTRA options, Solo Launch [Apartment is done? - Need to copy over], whatever else is missing.
--- HAVE FUN | VERSION: 1.0
+-- HAVE FUN
 local success, error = pcall(function()
 
     local function log_notify(message)
@@ -141,7 +141,7 @@ local success, error = pcall(function()
                         script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 6
                     end
                 elseif heistType == 'DIAMOND' then
-                    local approach = account.stats('H3OPT_APPROACH').int32
+                    local approach = account.stats(MPX() .. 'H3OPT_APPROACH').int32
                     if approach == 3 then
                         script.locals("fm_mission_controller", 20391).int32 = 12 -- 1
                         script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80 -- 3
@@ -426,3 +426,4 @@ if not success then
     print('Error initializing Heist Utils: ' .. tostring(error))
     return
 end
+
