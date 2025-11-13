@@ -6,7 +6,7 @@
 local success, error = pcall(function()
 
     local latestSupportedGTA = "1.71"
-    local VERSION = '1.0.2'
+    local VERSION = '1.1.2'
 
     local currentGTA = function()
         return invoker.call(0xFCA9373EF340AC0A).str
@@ -451,10 +451,6 @@ local success, error = pcall(function()
     apartmentMenu:button('Set 3mil Payout Cuts (Pacific Standard)'):tooltip(
         "Preset cut, everyone gets $3 Million, Pacific Standard ONLY.\nYou will see 160% cut only for yourself, everyone else will see -540% cut for you but 160% for everyone else.")
         :event(0, function()
-            if account.stats('HEIST_MISSION_RCONT_ID_1').string ~= PacificStandardId then -- PacificJob
-                log_notify('This preset cut is only for Pacific Standard Heist.')
-                return
-            end
 
             local success, error = pcall(function()
                 setCuts('APARTMENT', {160, 160, 160, 160})
