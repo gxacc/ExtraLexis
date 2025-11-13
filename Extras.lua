@@ -6,7 +6,7 @@
 local success, error = pcall(function()
 
     local latestSupportedGTA = "1.71"
-    local VERSION = '1.1.2'
+    local VERSION = '1.2.2'
 
     local currentGTA = function()
         return invoker.call(0xFCA9373EF340AC0A).str
@@ -188,17 +188,17 @@ local success, error = pcall(function()
                 elseif heistType == 'DIAMOND' then
                     local approach = account.stats(MPX() .. 'H3OPT_APPROACH').int32
                     if approach == 3 then
-                        script.locals("fm_mission_controller", 20391).int32 = 12 -- 1
-                        script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80 -- 3
-                        script.locals("fm_mission_controller", 20391 + 2686).int32 = 10000000 -- 4
-                        script.locals("fm_mission_controller", 29011 + 1).int32 = 99999 -- 5
-                        script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 6
+                        script.locals("fm_mission_controller", 20391).int32 = 12
+                        script.locals("fm_mission_controller", 22132).int32 = 80
+                        script.locals("fm_mission_controller", 23077).int32 = 10000000
+                        script.locals("fm_mission_controller", 29012).int32 = 99999
+                        script.locals("fm_mission_controller", 32536).int32 = 99999
                     else
-                        script.locals("fm_mission_controller", 20391 + 1062).int32 = 5 -- 2
-                        script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80 -- 3
-                        script.locals("fm_mission_controller", 20391 + 2686).int32 = 10000000 -- 4
-                        script.locals("fm_mission_controller", 29011 + 1).int32 = 99999 -- 5
-                        script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 6
+                        script.locals("fm_mission_controller", 21453).int32 = 5
+                        script.locals("fm_mission_controller", 22132).int32 = 80
+                        script.locals("fm_mission_controller", 23077).int32 = 10000000
+                        script.locals("fm_mission_controller", 29012).int32 = 99999
+                        script.locals("fm_mission_controller", 32536).int32 = 99999
                     end
                 elseif heist_type == 'DOOMSDAY' then
                     script.locals("fm_mission_controller", 20391).int32 = 12 -- 1
