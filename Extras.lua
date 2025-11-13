@@ -1,8 +1,8 @@
 -- Silent Night Heists Manager Lexis Port [SKID] { Credits: https://github.com/SilentSalo/SilentNight | https://github.com/xnightli06x/Silent-Night }
 -- Ported by @lrxxh & @piuro with the help of: Derkek, melonarmy122
 -- Testers: Derkek, 223, camera, Plex, Nexus
--- TODO: Doomsday, Cayo, Casino EXTRA options, Solo Launch [Apartment is done? - Need to copy over], whatever else is missing.
--- HAVE FUN | VERSION: 1.0
+-- TODO: Complete Preps for Diamond, cut presets, 12 mil payout
+-- HAVE FUN
 local success, error = pcall(function()
 
     local function log_notify(message)
@@ -141,7 +141,7 @@ local success, error = pcall(function()
                         script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 6
                     end
                 elseif heistType == 'DIAMOND' then
-                    local approach = account.stats('H3OPT_APPROACH').int32
+                    local approach = account.stats(MPX() .. 'H3OPT_APPROACH').int32
                     if approach == 3 then
                         script.locals("fm_mission_controller", 20391).int32 = 12 -- 1
                         script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80 -- 3
@@ -303,7 +303,7 @@ local success, error = pcall(function()
         log_notify("Cayo Perico Fingerprint hack bypassed.")
     end)
 
-    local cayoBagSize = cayoMenu:combo_int('Set Bag Size', {{'1x', 1}, {'2x', 2}, {'3x', 3}, {'4x', 4}}, 0)
+    local cayoBagSize = cayoMenu:combo_int('Set Bag Size', {{'1x', 1}, {'2x', 2}, {'3x', 3}, {'4x', 4}, {'5x', 5}}, 1)
 
     cayoMenu:button("Apply Bag Size"):event(0, function()
         local size = 1800 * cayoBagSize.value
