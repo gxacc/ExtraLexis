@@ -1,4 +1,4 @@
--- Silent Night Heists Manager Lexis Port [SKID] { Credits: https://github.com/SilentSalo/SilentNight | https://github.com/xnightli06x/Silent-Night }
+-- Silent Night Heists Manager Lexis Port [SKID] { Credits: https://github.com/SilentSalo/SilentNight }
 -- Ported by @lrxxh & @piuro with the help of: Derkek, melonarmy122
 -- Testers: Derkek, 223, camera, Plex, Nexus
 -- TODO: Complete Preps for Diamond, cut presets, 12 mil payout (pacific), teleport to heist board, teleport to entrance 
