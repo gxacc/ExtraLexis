@@ -75,14 +75,74 @@ local success, error = pcall(function()
     local function ApartmentReloadTable() -- Apartment Heists Reload Planning Screen
         script.globals(1931835).int32 = 22
     end
+    local agencyContracts = {
+        {'None',           3},
+        {'Nightclub',      4},
+        {'Marina',         12},
+        {'Nightlife Leak', 28},
+        {'Country Club',   60},
+        {'Guest List',     123},
+        {'High Social Leak', 254},
+        {'Davis',          508},
+        {'Ballas',         1020},
+        {'South Central Leak', 2044},
+        {'Studio Time',    2045},
+        {"Don't Fuck W. Dre", 4095}
+    }
 
+
+    local agencyContracts = {
+        {'None',           3},
+        {'Nightclub',      4},
+        {'Marina',         12},
+        {'Nightlife Leak', 28},
+        {'Country Club',   60},
+        {'Guest List',     123},
+        {'High Social Leak', 254},
+        {'Davis',          508},
+        {'Ballas',         1020},
+        {'South Central Leak', 2044},
+        {'Studio Time',    2045},
+        {"Don't Fuck W. Dre", 4095}
+    }
+
+    local function agencyCompletePreps(contractIndex)
+        account.stats(MPX() .. "FIXER_STORY_BS").int32 = contractIndex
+        if contractIndex < 18 then
+            account.stats(MPX() .. "FIXER_STORY_STRAND").int32 = 0
+        elseif contractIndex < 128 then
+            account.stats(MPX() .. "FIXER_STORY_STRAND").int32 = 1
+        elseif contractIndex < 2044 then
+            account.stats(MPX() .. "FIXER_STORY_STRAND").int32 = 2
+        else
+            account.stats(MPX() .. "FIXER_STORY_STRAND").int32 = -1
+        end
+        account.stats(MPX() .. "FIXER_GENERAL_BS").int32 = -1
+        account.stats(MPX() .. "FIXER_COMPLETED_BS").int32 = -1
+    end
+
+    local function agencyInstantFinish()
+        script.locals("fm_mission_controller_2020", 54763 + 1).int32 = 51338752
+        script.locals("fm_mission_controller_2020", 54763 + 1776 + 1).int32 = 50
+        log_notify('[Instant Finish (Agency)] Heist should have been finished.')
+    end
+
+    local function agencyApplyPayout(payout)
+        script.tunables(joaat("FIXER_FINALE_LEADER_CASH_REWARD")).int32 = payout
+        log_notify('Payout should\'ve been applied')
+    end
     local cutPercentages = {}
+    local agencyPayoutOptions = {}
+
 
     for i = 0, 200, 5 do
         table.insert(cutPercentages, {i .. '%', i})
     end
 
     local Menu = menu.root()
+    for payout = 0, 2500000, 100000 do
+        table.insert(agencyPayoutOptions, {tostring(payout), payout})
+    end
 
     local heist_types = {{'APARTMENT', 0}, {'DIAMOND', 1}, {'DOOMSDAY', 2}, {'CAYO', 3}, {'AUTOSHOP', 4}, {'AGENCY', 5}}
 
@@ -295,6 +355,66 @@ local success, error = pcall(function()
         end)
 
     local extraMenu = Menu:submenu('Other Options')
+
+    local agencyMenu = extraMenu:submenu('Agency')
+
+    local agencyContractCombo = agencyMenu:combo_int('VIP Contract', agencyContracts, 0)
+
+    agencyMenu:button('Apply & Complete Preps'):event(0, function()
+        local success, error = pcall(function()
+            local idx = agencyContractCombo.value
+            local entry = agencyContracts[idx]
+            if not entry then
+                log_notify('[Agency Preps] No contract selected')
+                return
+            end
+            local name = entry[1]
+            local contractIndex = entry[2]
+            log_notify(string.format('[Agency Preps] Selected contract: %s (index %d)', name, contractIndex))
+            agencyCompletePreps(contractIndex)
+        end)
+        if not success then
+            log_notify('[Agency Preps] Error: ' .. tostring(error))
+        end
+    end)
+
+    agencyMenu:button('Instant Finish VIP Contract'):tooltip('Finishes the current Agency mission instantly. Use after you can see the minimap.'):event(0, function()
+        local success, error = pcall(function()
+            agencyInstantFinish()
+        end)
+        if not success then
+            log_notify('[Instant Finish (Agency)] Error: ' .. tostring(error))
+        end
+    end)
+
+    local agencyPayoutCombo = agencyMenu:combo_int('Payout', agencyPayoutOptions, 0)
+
+    agencyMenu:button('Max Payout'):tooltip('Maximizes the payout, but does not apply it.'):event(0, function()
+        local success, error = pcall(function()
+            agencyPayoutCombo.value = #agencyPayoutOptions
+            log_notify('Payout should\'ve been maximized. Don\'t forget to apply')
+        end)
+        if not success then
+            log_notify('Error: ' .. tostring(error))
+        end
+    end)
+
+    agencyMenu:button('Apply Payout'):tooltip('Applies the selected payout. Use after you can see the minimap.'):event(0, function()
+        local success, error = pcall(function()
+            local idx = agencyPayoutCombo.value
+            local entry = agencyPayoutOptions[idx]
+            if not entry then
+                log_notify(' No payout selected')
+                return
+            end
+            local payout = entry[2]
+            agencyApplyPayout(payout)
+        end)
+        if not success then
+            log_notify('Error: ' .. tostring(error))
+        end
+    end)
+
 
     local cayoMenu = extraMenu:submenu('Cayo Perico')
 
