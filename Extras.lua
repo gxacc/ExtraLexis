@@ -426,4 +426,3 @@ if not success then
     print('Error initializing Heist Utils: ' .. tostring(error))
     return
 end
-
