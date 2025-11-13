@@ -1,13 +1,56 @@
 -- Silent Night Heists Manager Lexis Port [SKID] { Credits: https://github.com/SilentSalo/SilentNight | https://github.com/xnightli06x/Silent-Night }
 -- Ported by @lrxxh & @piuro with the help of: Derkek, melonarmy122
 -- Testers: Derkek, 223, camera, Plex, Nexus
--- TODO: Complete Preps for Diamond, cut presets, 12 mil payout
+-- TODO: Complete Preps for Diamond, cut presets, 12 mil payout (pacific), teleport to heist board, teleport to entrance 
 -- HAVE FUN
 local success, error = pcall(function()
+
+    local latestSupportedGTA = "1.71"
+    local VERSION = '1.0.2'
+
+    local currentGTA = function()
+        return invoker.call(0xFCA9373EF340AC0A).str
+    end
 
     local function log_notify(message)
         notify.push('[Heist Utils]', message, 2000)
         print(message)
+    end
+
+    if currentGTA() ~= latestSupportedGTA then
+        log_notify(
+            'Warning: GTA version (' .. currentGTA() .. ') is not yet supported.\nLatest supported version is ' ..
+                latestSupportedGTA .. '.\nIf your game is below this version, please update GTA.')
+        return
+    end
+
+    local versionMap = function(ver)
+        local t = {}
+        for i = 1, #ver do
+            t[i] = ver:sub(i, i)
+        end
+        return {
+            Major = tonumber(t[1]),
+            Minor = tonumber(t[3]),
+            Patch = tonumber(t[5])
+        }
+    end
+
+    local VERSION_MAP = versionMap(VERSION)
+
+    local LATEST_VERSION = versionMap(http.fetch('https://github.com/gxacc/ExtraLexis/raw/refs/heads/main/VERSION', {})
+                                          .text)
+
+    if LATEST_VERSION.Major > VERSION_MAP.Major or LATEST_VERSION.Minor > VERSION_MAP.Minor then
+        log_notify('A new version is available! (' .. LATEST_VERSION.Major .. '.' .. LATEST_VERSION.Minor ..
+                       LATEST_VERSION.Patch .. ')\nYou are running version ' .. VERSION ..
+                       '.\nScript will not be loaded, please update!.')
+        return
+    end
+
+    if LATEST_VERSION.Patch > VERSION_MAP.Patch then
+        log_notify('A new patch version is available! (' .. LATEST_VERSION.Major .. '.' .. LATEST_VERSION.Minor ..
+                       LATEST_VERSION.Patch .. ')\nYou are running version ' .. VERSION .. ' consider updating.')
     end
 
     local function MPX()
@@ -82,6 +125,8 @@ local success, error = pcall(function()
         table.insert(cutPercentages, {i .. '%', i})
     end
 
+    local PacificStandardId = "zCxFg29teE2ReKGnr0L4Bg"
+
     local Menu = menu.root()
 
     local heist_types = {{'APARTMENT', 0}, {'DIAMOND', 1}, {'DOOMSDAY', 2}, {'CAYO', 3}, {'AUTOSHOP', 4}, {'AGENCY', 5}}
@@ -128,7 +173,7 @@ local success, error = pcall(function()
                 local heistType = _heistType(heistSelector.value)
                 if heistType == 'APARTMENT' then
                     local heist = account.stats('HEIST_MISSION_RCONT_ID_1').string
-                    if heist == 'zCxFg29teE2ReKGnr0L4Bg' then -- PacificJob
+                    if heist == PacificStandardId then -- PacificJob
                         script.locals("fm_mission_controller", 20391 + 1062).int32 = 5 -- 2
                         script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80 -- 3
                         script.locals("fm_mission_controller", 20391 + 2686).int32 = 10000000 -- 4
@@ -406,6 +451,11 @@ local success, error = pcall(function()
     apartmentMenu:button('Set 3mil Payout Cuts (Pacific Standard)'):tooltip(
         "Preset cut, everyone gets $3 Million, Pacific Standard ONLY.\nYou will see 160% cut only for yourself, everyone else will see -540% cut for you but 160% for everyone else.")
         :event(0, function()
+            if account.stats('HEIST_MISSION_RCONT_ID_1').string ~= PacificStandardId then -- PacificJob
+                log_notify('This preset cut is only for Pacific Standard Heist.')
+                return
+            end
+
             local success, error = pcall(function()
                 setCuts('APARTMENT', {160, 160, 160, 160})
             end)
