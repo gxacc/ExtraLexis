@@ -1,12 +1,11 @@
 -- Silent Night Heists Manager Lexis Port [SKID] { Credits: https://github.com/SilentSalo/SilentNight }
 -- Ported by @lrxxh & @piuro with the help of: Derkek, melonarmy122
 -- Testers: Derkek, 223, camera, Plex, Nexus
--- TODO: Complete Preps for Diamond, cut presets, 12 mil payout (pacific), teleport to heist board, teleport to entrance 
+-- TODO: FIX !TODO IN LINE: 114 BEFORE ANYTHING | Complete Preps for Diamond, cut presets, 12 mil payout (pacific), teleport to heist board, teleport to entrance 
 -- HAVE FUN
-local success, error = pcall(function()
-
+local function loadMenu(menuRef)
     local latestSupportedGTA = "1.71"
-    local VERSION = '1.2.2'
+    local VERSION = '1.3.0'
 
     local currentGTA = function()
         return invoker.call(0xFCA9373EF340AC0A).str
@@ -48,7 +47,8 @@ local success, error = pcall(function()
         return
     end
 
-    if LATEST_VERSION.Patch > VERSION_MAP.Patch then
+    if LATEST_VERSION.Patch > VERSION_MAP.Patch and LATEST_VERSION.Minor == VERSION_MAP.Minor and LATEST_VERSION.Major ==
+        VERSION_MAP.Major then
         log_notify('A new patch version is available! (' .. LATEST_VERSION.Major .. '.' .. LATEST_VERSION.Minor ..
                        LATEST_VERSION.Patch .. ')\nYou are running version ' .. VERSION .. ' consider updating.')
     end
@@ -68,7 +68,13 @@ local success, error = pcall(function()
         return value
     end
 
-    local function setCuts(heist, cuts)
+    local cutPercentages = {}
+
+    for i = 0, 200, 5 do
+        table.insert(cutPercentages, {i .. '%', i})
+    end
+
+    local function setCuts(heist, cuts, noself)
         local base_values = {
             CAYO = 1975799 + 831 + 56,
             DOOMSDAY = 1964170 + 812 + 50,
@@ -84,8 +90,16 @@ local success, error = pcall(function()
             base = 1931800 + 1
             for i, cut in ipairs(cuts) do
                 if i == 1 then
-                    script.globals(base + i).int32 = 100 - (4 * cut)
-                    script.globals(1933768 + 3008 + 1).int32 = cut
+                    log_notify('Setting Player 1 (External - Non local cut) to: ' ..
+                                   tostring(100 - (4 * math.max(table.unpack(cuts)))) .. '%.')
+                    script.globals(base + i).int32 = 100 - (4 * math.max(table.unpack(cuts)))
+                    if noself then
+                        log_notify('Setting no cut for self (Local), adjusting Player 1 cut accordingly.')
+                        script.globals(1933768 + 3008 + 1).int32 = 0
+                    else
+                        log_notify('Setting Player 1 (Local) cut to: ' .. tostring(cut) .. '%.')
+                        script.globals(1933768 + 3008 + 1).int32 = cut
+                    end
                 else
                     script.globals(base + i).int32 = cut
                 end
@@ -96,6 +110,158 @@ local success, error = pcall(function()
             end
         end
     end
+    -- !TODO: Refactor this and make it so there is 1 set of instant finsher/cut setter "logic" blocks so we dont have to maintain both.
+    local function createHeistMenu(extraMenu, heistKey, heistName)
+        local sM = extraMenu:submenu(heistName)
+
+        local finisherMenu = sM:submenu('Instant Finisher')
+
+        finisherMenu:button('Old Method'):tooltip(
+            'Use the old method to instantly finish heist missions, slower, works for all players, saves the preps.')
+            :event(0, function()
+                local success, error = pcall(function()
+                    if not script.running("fm_mission_controller") then
+                        log_notify("Heist mission is not active.")
+                        return
+                    end
+                    local heistType = heistKey
+                    if heistType == 'APARTMENT' then
+                        local heist = account.stats('HEIST_MISSION_RCONT_ID_1').string
+                        if heist == PacificStandardId then -- PacificJob
+                            script.locals("fm_mission_controller", 20391 + 1062).int32 = 5 -- 2
+                            script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 80 -- 3
+                            script.locals("fm_mission_controller", 20391 + 2686).int32 = 10000000 -- 4
+                            script.locals("fm_mission_controller", 29011 + 1).int32 = 99999 -- 5
+                            script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 6
+                        else
+                            script.locals("fm_mission_controller", 20391).int32 = 12 -- 1
+                            script.locals("fm_mission_controller", 20391 + 2686).int32 = 99999 -- 4
+                            script.locals("fm_mission_controller", 29011 + 1).int32 = 99999 -- 5
+                            script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 6
+                        end
+                    elseif heistType == 'DIAMOND' then
+                        local approach = account.stats(MPX() .. 'H3OPT_APPROACH').int32
+                        if approach == 3 then
+                            script.locals("fm_mission_controller", 20391).int32 = 12
+                            script.locals("fm_mission_controller", 22132).int32 = 80
+                            script.locals("fm_mission_controller", 23077).int32 = 10000000
+                            script.locals("fm_mission_controller", 29012).int32 = 99999
+                            script.locals("fm_mission_controller", 32536).int32 = 99999
+                        else
+                            script.locals("fm_mission_controller", 21453).int32 = 5
+                            script.locals("fm_mission_controller", 22132).int32 = 80
+                            script.locals("fm_mission_controller", 23077).int32 = 10000000
+                            script.locals("fm_mission_controller", 29012).int32 = 99999
+                            script.locals("fm_mission_controller", 32536).int32 = 99999
+                        end
+                    elseif heist_type == 'DOOMSDAY' then
+                        script.locals("fm_mission_controller", 20391).int32 = 12 -- 1
+                        script.locals("fm_mission_controller", 20391 + 1740 + 1).int32 = 150 -- 2
+                        script.locals("fm_mission_controller", 29011 + 1).int32 = 99999 -- 3
+                        script.locals("fm_mission_controller", 32467 + 1 + 68).int32 = 99999 -- 4
+                        script.locals("fm_mission_controller", 32467 + 97).int32 = 80 -- 5
+                    elseif heist_type == 'CAYO' then
+                        script.locals("fm_mission_controller_2020", 54763).int32 = 9 -- 1
+                        script.locals("fm_mission_controller_2020", 54763 + 1776 + 1).int32 = 50 -- 2
+                    elseif heist_type == 'AUTOSHOP' then
+                        script.locals("fm_mission_controller_2020", 54763 + 1).int32 = 51338977 -- 1
+                        script.locals("fm_mission_controller_2020", 54763 + 1776 + 1).int32 = 101 -- 2
+                    elseif heist_type == 'AGENCY' then
+                        script.locals("fm_mission_controller_2020", 54763 + 1).int32 = 51338752 -- 1
+                        script.locals("fm_mission_controller_2020", 54763 + 1776 + 1).int32 = 50 -- 2
+                    end
+                end)
+                if not success then
+                    log_notify('Error applying instant finish [OLD]: ' .. tostring(error))
+                    return
+                end
+                log_notify('Instant finish applied with the old method :)')
+            end)
+
+        finisherMenu:button('New Method'):tooltip(
+            'Use the new method to instantly finish heist missions, faster, may not work for all players, does not save the preps.')
+            :event(0, function()
+                local success, error = pcall(function()
+                    if not script.running("fm_mission_controller") and not script.running("fm_mission_controller_2020") then
+                        log_notify("Heist mission is not active.")
+                        return
+                    end
+                    local Finish = {
+                        Old = {
+                            Step1 = {
+                                vLocal = 20391 + 1062
+                            },
+                            Step2 = {
+                                vLocal = 20391 + 1232 + 1
+                            },
+                            Step3 = {
+                                vLocal = 20391 + 1
+                            }
+                        },
+                        New = {
+                            Step1 = {
+                                vLocal = 54763 + 1589
+                            },
+                            Step2 = {
+                                vLocal = 54763 + 1776 + 1
+                            },
+                            Step3 = {
+                                vLocal = 54763 + 1
+                            }
+                        }
+                    }
+
+                    local heistType = heistKey
+                    local hlist = {'CAYO', 'AUTOSHOP', 'AGENCY'}
+                    if hlist[heistType] then
+                        local Script = "fm_mission_controller_2020"
+                        script.locals(Script, Finish.New.Step1.vLocal).int32 = 5
+                        script.locals(Script, Finish.New.Step2.vLocal).int32 = 999999
+                        script.locals(Script, Finish.New.Step3.vLocal).int32 = SetBits(
+                            script.locals(Script, Finish.New.Step3.vLocal).int32, {9, 16})
+                    else
+                        local Script = "fm_mission_controller"
+                        script.locals(Script, Finish.Old.Step1.vLocal).int32 = 5
+                        script.locals(Script, Finish.Old.Step2.vLocal).int32 = 999999
+                        local value = SetBits(script.locals(Script, Finish.Old.Step3.vLocal).int32, {9, 16})
+                        script.locals(Script, Finish.Old.Step3.vLocal).int32 = value
+                    end
+                end)
+                if not success then
+                    log_notify('Error applying instant finish [NEW]: ' .. tostring(error))
+                    return
+                end
+                log_notify('Instant finish applied with the new method :)')
+            end)
+
+        local cutsMenu = sM:submenu('Player Cut Editor')
+
+        local cut_player1 = cutsMenu:combo_int('Player 1 Cut', cutPercentages, 0)
+        local cut_player2 = cutsMenu:combo_int('Player 2 Cut', cutPercentages, 0)
+        local cut_player3 = cutsMenu:combo_int('Player 3 Cut', cutPercentages, 0)
+        local cut_player4 = cutsMenu:combo_int('Player 4 Cut', cutPercentages, 0)
+
+        local cutsApplyButton = cutsMenu:button('Apply Cuts'):tooltip(
+            'Apply the selected cut percentages to the selected heist.'):event(0, function()
+            local success, error = pcall(function()
+                local cuts = function()
+                    return {cutPercentages[cut_player1.value][2], cutPercentages[cut_player2.value][2],
+                            cutPercentages[cut_player3.value][2], cutPercentages[cut_player4.value][2]}
+                end
+
+                setCuts(heistKey, cuts())
+            end)
+
+            if not success then
+                log_notify('Error applying cuts: ' .. tostring(error))
+                return
+            end
+
+            log_notify(string.format('[%s] Cuts set successfully!', heist))
+        end)
+
+        return sM
+    end
 
     local function DoomsdayActSetter(progress, status)
         account.stats(MPX() .. "GANGOPS_FLOW_MISSION_PROG").int32 = progress
@@ -104,14 +270,26 @@ local success, error = pcall(function()
     end
 
     local function DoomsdayReloadTable() -- Doomsday Reload Planning Screen
+        if not script.running("gb_gang_ops_planning") then
+            log_notify("Doomsday Heist is not active.")
+            return
+        end
         script.locals("gb_gang_ops_planning", 209).int32 = 6
     end
 
     local function CasinoReloadTable() -- Diamond Heist Reload Planning Screen
+        if not script.running("gb_casino_heist_planning") then
+            log_notify("Diamond Heist is not active.")
+            return
+        end
         script.locals("gb_casino_heist_planning", 210).int32 = 2
     end
 
     local function CayoReloadTable() -- Cayo Perico Heist Reload Planning Screen
+        if not script.running("heist_island_planning") then
+            log_notify("Cayo Perico Heist is not active.")
+            return
+        end
         script.locals("heist_island_planning", 1568).int32 = 2
     end
 
@@ -119,15 +297,9 @@ local success, error = pcall(function()
         script.globals(1931835).int32 = 22
     end
 
-    local cutPercentages = {}
-
-    for i = 0, 200, 5 do
-        table.insert(cutPercentages, {i .. '%', i})
-    end
-
     local PacificStandardId = "zCxFg29teE2ReKGnr0L4Bg"
 
-    local Menu = menu.root()
+    local Menu = menuRef or menu.root()
 
     local heist_types = {{'APARTMENT', 0}, {'DIAMOND', 1}, {'DOOMSDAY', 2}, {'CAYO', 3}, {'AUTOSHOP', 4}, {'AGENCY', 5}}
 
@@ -170,6 +342,10 @@ local success, error = pcall(function()
         'Use the old method to instantly finish heist missions, slower, works for all players, saves the preps.'):event(
         0, function()
             local success, error = pcall(function()
+                if not script.running("fm_mission_controller") then
+                    log_notify("Heist mission is not active.")
+                    return
+                end
                 local heistType = _heistType(heistSelector.value)
                 if heistType == 'APARTMENT' then
                     local heist = account.stats('HEIST_MISSION_RCONT_ID_1').string
@@ -228,7 +404,10 @@ local success, error = pcall(function()
         'Use the new method to instantly finish heist missions, faster, may not work for all players, does not save the preps.')
         :event(0, function()
             local success, error = pcall(function()
-
+                if not script.running("fm_mission_controller") and not script.running("fm_mission_controller_2020") then
+                    log_notify("Heist mission is not active.")
+                    return
+                end
                 local Finish = {
                     Old = {
                         Step1 = {
@@ -341,9 +520,13 @@ local success, error = pcall(function()
 
     local extraMenu = Menu:submenu('Other Options')
 
-    local cayoMenu = extraMenu:submenu('Cayo Perico')
+    local cayoMenu = createHeistMenu(extraMenu, "CAYO", "Cayo Perico")
 
     cayoMenu:button("Bypass Fingerprint Hack"):event(0, function()
+        if not script.running("fm_mission_controller_2020") then
+            log_notify("Cayo Perico Heist is not active.")
+            return
+        end
         script.locals("fm_mission_controller_2020", 25460).int32 = 5
         log_notify("Cayo Perico Fingerprint hack bypassed.")
     end)
@@ -356,7 +539,7 @@ local success, error = pcall(function()
         log_notify("Cayo Perico Bag Size set to " .. size)
     end)
 
-    local doomsdayMenu = extraMenu:submenu('Doomsday Heist')
+    local doomsdayMenu = createHeistMenu(extraMenu, "DOOMSDAY", "Doomsday Heist")
 
     local doomsdayActsMenu = doomsdayMenu:submenu('Doomsday Acts Progress Setter')
 
@@ -383,10 +566,14 @@ local success, error = pcall(function()
     end)
 
     doomsdayMenu:button("Act 3 Pass Hack"):event(0, function()
+        if not script.running("fm_mission_controller") then
+            log_notify("Heist mission is not active.")
+            return
+        end
         script.locals("fm_mission_controller", 1294 + 135).int32 = 3
     end)
 
-    local diamondMenu = extraMenu:submenu('Diamond Heist')
+    local diamondMenu = createHeistMenu(extraMenu, "DIAMOND", "Diamond Casino Heist")
 
     diamondMenu:button('Set Crew Cut to 1%'):event(0, function()
         script.tunables(joaat("CH_LESTER_CUT")).int32 = 1
@@ -397,6 +584,10 @@ local success, error = pcall(function()
     end)
 
     diamondMenu:button('Bypass Fingerprint/Keypad Hack'):event(0, function()
+        if not script.running("fm_mission_controller") then
+            log_notify("Diamond Heist is not active.")
+            return
+        end
         if script.locals("fm_mission_controller", 54037).int32 == 4 then
             script.locals("fm_mission_controller", 54037).int32 = 5
             log_notify("Fingerprint hack bypassed.")
@@ -412,7 +603,7 @@ local success, error = pcall(function()
         end
     end)
 
-    local apartmentMenu = extraMenu:submenu('Apartment Heists')
+    local apartmentMenu = createHeistMenu(extraMenu, "APARTMENT", "Apartment Heists")
 
     apartmentMenu:button('Unlock All Jobs'):event(0, function()
         account.stats(MPX() .. "HEIST_SAVED_STRAND_0").int32 =
@@ -448,12 +639,32 @@ local success, error = pcall(function()
         script.globals(1876941 + 1 + (players.me().id * 77) + 76).int32 = -1
     end)
 
-    apartmentMenu:button('Set 3mil Payout Cuts (Pacific Standard)'):tooltip(
+    local apPresetCutsMenu = apartmentMenu:submenu('3 million Preset Payout Cuts')
+
+    local apPresetsNoCut = apPresetCutsMenu:toggle('No Cut For Self')
+
+    apPresetCutsMenu:button('Pacific Standard - Hard Mode'):tooltip(
         "Preset cut, everyone gets $3 Million, Pacific Standard ONLY.\nYou will see 160% cut only for yourself, everyone else will see -540% cut for you but 160% for everyone else.")
         :event(0, function()
 
             local success, error = pcall(function()
-                setCuts('APARTMENT', {160, 160, 160, 160})
+                setCuts('APARTMENT', {160, 160, 160, 160}, apPresetsNoCut.value)
+            end)
+
+            if not success then
+                log_notify('Error applying preset cuts: ' .. tostring(error))
+                return
+            end
+
+            log_notify("Set payout cuts for players to $3,000,000 each.")
+        end)
+
+    apPresetCutsMenu:button('Fleeca Job - Normal Mode'):tooltip(
+        "Preset cut, everyone gets $3 Million, Fleeca ONLY.\nYou will see 1490% cut only for yourself, everyone else will see -5860% cut for you but 1490% for everyone else.")
+        :event(0, function()
+
+            local success, error = pcall(function()
+                setCuts('APARTMENT', {1490, 1490, 1490, 1490}, apPresetsNoCut.value)
             end)
 
             if not success then
@@ -465,6 +676,10 @@ local success, error = pcall(function()
         end)
 
     log_notify('Heist Utils initialized successfully!')
+end
+
+local success, error = pcall(function()
+    loadMenu()
 end)
 
 if not success then
